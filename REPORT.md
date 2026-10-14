@@ -1,4 +1,4 @@
-Họ tên: [[TODO: họ tên]]
+Họ tên: Nguyễn Công Thịnh
 `dataset_version`: d10-21e4070301
 
 > Các số liệu lấy từ thí nghiệm (F1, CI95, FP/ảnh, VRAM, phút, hiệu F1 ghép cặp) được điền tự động từ `report/evidence/*.json` bằng `python lab/fill_report.py` (không gõ tay, để luôn khớp với bằng chứng). Các số khác (tham số từng khối, số ảnh/box, kiểm tra rò rỉ, kiểm tra thang toạ độ "oracle") là số mình tự đo bằng các cell trong `lab_day10.ipynb` (mục 1, 2, 4, 5), chạy được không cần GPU.
@@ -12,11 +12,11 @@ Họ tên: [[TODO: họ tên]]
 | E2 | + projector | 142,135,296 | 11.53 | 53.03 | 0.330 | [0.293, 0.370] | 1.09 | 0.165 | 0.273 | 0.593 |
 | E3 | + LoRA ViT | 148,426,752 | 10.20 | 75.85 | 0.435 | [0.394, 0.480] | 0.87 | 0.251 | 0.359 | 0.730 |
 | E4 | coord_scale = norm1000 (= setup gốc) | 148,426,752 | 10.20 | 75.85 | 0.435 | [0.394, 0.480] | 0.87 | 0.251 | 0.359 | 0.730 |
-| E4 | coord_scale = pixel | {{e4_coord_scale_pixel.params}} | {{e4_coord_scale_pixel.vram}} | {{e4_coord_scale_pixel.min}} | {{e4_coord_scale_pixel.f1}} | {{e4_coord_scale_pixel.ci}} | {{e4_coord_scale_pixel.fp}} | {{e4_coord_scale_pixel.f1_pothole}} | {{e4_coord_scale_pixel.f1_crack}} | {{e4_coord_scale_pixel.f1_manhole}} |
+| E4 | coord_scale = pixel | 148,426,752 | 9.66 (bước 1) | – | **chưa chạy xong** (hết quota GPU Colab, xem câu 10) | – | – | – | – | – |
 
 Bổ sung (cùng nguồn): `parse_valid_rate` E0/E1/E2/E3 = 0.752 / 1.000 / 1.000 / 1.000; mean IoU của các cặp khớp = 0.613 / 0.677 / 0.669 / 0.692. Bảng đầy đủ hơn (P, R, meanIoU) do notebook sinh ra ở `report/summary_table.md`.
 
-**Ghi chú về cách chạy.** E0 và bước *huấn luyện* E1 chạy khi `load_base_model` còn lỗi lượng tử hoá nhầm ViT (câu 5), nên ViT/projector của hai lượt này ở 4-bit. E1 được *đánh giá* và E2, E3 chạy hoàn toàn với ViT fp16. E3 hết VRAM với batch 2 nên chạy batch 1 × tích luỹ 8 (batch hiệu dụng vẫn là 8, lr và số bước như E1/E2). Thời gian thật mỗi lần huấn luyện là 52–76 phút, gấp đôi ước lượng 20–30 phút của README. Log đầy đủ của lượt chạy này nằm ở `report/notebook_run1_E0-E3.ipynb`.
+**Ghi chú về cách chạy.** E0 và bước *huấn luyện* E1 chạy khi `load_base_model` còn lỗi lượng tử hoá nhầm ViT (câu 5), nên ViT/projector của hai lượt này ở 4-bit. E1 được *đánh giá* và E2, E3 chạy hoàn toàn với ViT fp16. E3 hết VRAM với batch 2 nên chạy batch 1 × tích luỹ 8 (batch hiệu dụng vẫn là 8, lr và số bước như E1/E2). Thời gian thật mỗi lần huấn luyện là 52–76 phút, gấp đôi ước lượng 20–30 phút của README. Log đầy đủ của lượt chạy nằm ngay trong `lab_day10.ipynb` (notebook đã chạy, giữ nguyên output). Hai cell `import gc, sys` trước E2 và E3 là bản sửa `load_base_model` mình chèn vào giữa lượt chạy, sau khi phát hiện lỗi ở câu 5.
 
 **Ảnh minh hoạ** (sinh trong notebook, mục 7):
 
@@ -27,7 +27,7 @@ Bổ sung (cùng nguồn): `parse_valid_rate` E0/E1/E2/E3 = 0.752 / 1.000 / 1.00
 - `report/figures/qualitative_e3.png` — 8 ảnh test của setup tốt nhất (E3): hàng trên 4 ảnh dự đoán tốt, hàng dưới 4 ảnh sai nhiều nhất. Xanh lá dày = box đúng (GT), xanh dương đứt = dự đoán khớp (TP), đỏ đứt = dự đoán sai (FP); tiêu đề ghi TP/FP/FN và lớp bị sót.
 - `report/figures/qualitative_e0.png` — cùng kiểu cho E0 zero-shot.
 - `report/figures/compare_runs.png` — 3 ảnh nhiều box nhất qua E0 → E1 → setup tốt nhất.
-- `report/figures/recall_by_size_e3.png`, `report/figures/results_overview.png`, `report/figures/loss_curves.png`, `report/figures/e4_coord_scale.png`, `report/figures/data_samples.png`, `report/figures/data_stats.png`, `report/figures/leak_check.png`, `report/figures/label_roundtrip.png`.
+- `report/figures/recall_by_size_e3.png`, `report/figures/results_overview.png`, `report/figures/loss_curves.png`, `report/figures/data_samples.png`, `report/figures/data_stats.png`, `report/figures/leak_check.png`, `report/figures/label_roundtrip.png`.
 
 ## 10 câu hỏi (trả lời bằng **số của bạn**, không chép lại tài liệu)
 
@@ -85,7 +85,7 @@ F1 gần như **sụp về 0**. Mình kiểm chứng bằng ba cách:
 
    Đáp án hoàn hảo mà chỉ lệch thang cũng chỉ còn 0 TP. Lý do: box pixel (x ≤ 640, y ≤ 360) khi bị đọc như thang 0–1000 sẽ bị **co lại 0,64 lần theo x và 0,36 lần theo y** về phía góc trên-trái. Ngược lại, box 0–1000 đọc như pixel bị phóng 1,56 lần / 2,78 lần (nhiều box rơi ra ngoài khung). Box ở đây rất nhỏ (diện tích trung vị: pothole 0,38%, manhole 0,46%, crack 1,42% khung hình), nên chỉ cần dịch vài chục pixel là IoU < 0,5, tức là không còn cặp nào khớp.
 2. **Trên output thật của model**: chấm lại dự đoán của E3 (setup tốt nhất) với `--coord pixel`: F1 từ **0,435 xuống 0,000** (P = R = 0, FP/ảnh tăng từ 0,87 lên 1,64). Với E0 cũng vậy: 0,072 → 0,000.
-3. **E4 (coord_scale)**: huấn luyện lại với nhãn + prompt theo pixel và chấm đúng `--coord pixel` thì F1 = {{e4_coord_scale_pixel.f1}} (so với 0.435 khi dùng 0–1000). Như vậy thang nào cũng học được, miễn là **nhãn, prompt và cách chấm cùng một thang**. Xem câu 10.
+3. **E4 (coord_scale)**: mình định kiểm chứng thêm bằng cách huấn luyện lại với nhãn + prompt theo pixel rồi chấm đúng `--coord pixel`, nhưng lượt này không chạy xong (câu 10). Hai cách trên đã đủ cho thấy: điều quyết định là **nhãn, prompt và cách chấm phải cùng một thang**.
 
 Vì sao Qwen3-VL dùng 0–1000: toạ độ tương đối **không phụ thuộc độ phân giải**. Processor luôn resize ảnh (ở đây 640×360 → 640×352 để chia hết cho 32), và mỗi ảnh khác cỡ sẽ có dải pixel khác nhau. Còn 0–1000 là quy ước cố định mà model đã thấy khi pretrain grounding.
 
@@ -212,18 +212,23 @@ Nhận xét từ ảnh:
 
 ### Câu 10 — E4: bạn đổi biến nào, kết quả thế nào, và kết luận có đáng tin không?
 
-Mình chọn biến **`coord_scale`**: `norm1000` và `pixel`. Đây đúng là giả thuyết của câu 3: nếu model đã quen thang 0–1000 từ pretrain thì ép nó học pixel có thiệt không? Mình giữ nguyên mọi thứ khác của setup tốt nhất (**E3**): cùng r, lr, số bước, seed, dữ liệu, và cùng batch 1 × tích luỹ 8 như lượt E3 thật (`e4_run` lấy cấu hình từ `run.json` của E3, không đọc lại yaml). Chỉ đổi **cả** nhãn huấn luyện, prompt ("absolute integer pixel coordinates of the 640x360 image") **và** cách chấm (`--coord pixel`). Giá trị `norm1000` chính là setup gốc, nên mình chấm lại đúng file dự đoán của nó dưới tên E4, không huấn luyện lại.
+Mình chọn biến **`coord_scale`** với hai giá trị `norm1000` và `pixel`. Đây đúng là giả thuyết của câu 3: nếu model đã quen thang 0–1000 từ pretrain thì ép nó học pixel có thiệt không? Setup gốc là setup tốt nhất (**E3**). Ở giá trị `pixel`, mình đổi **cả** nhãn huấn luyện, prompt ("absolute integer pixel coordinates of the 640x360 image") **và** cách chấm (`--coord pixel`), giữ nguyên r, lr, số bước, seed, dữ liệu.
 
 | coord_scale | F1 | CI95 | F1 pothole / crack / manhole | parse_valid |
 |---|---|---|---|---|
-| norm1000 | 0.435 | [0.394, 0.480] | 0.251 / 0.359 / 0.730 | 1.000 |
-| pixel | {{e4_coord_scale_pixel.f1}} | {{e4_coord_scale_pixel.ci}} | {{e4_coord_scale_pixel.f1_pothole}} / {{e4_coord_scale_pixel.f1_crack}} / {{e4_coord_scale_pixel.f1_manhole}} | {{e4_coord_scale_pixel.valid}} |
+| norm1000 (= E3, chấm lại dưới tên E4) | 0.435 | [0.394, 0.480] | 0.251 / 0.359 / 0.730 | 1.000 |
+| pixel | chưa có | – | – | – |
 
-Hiệu pixel − norm1000 = {{paired:e4_coord_scale_pixel:e4_coord_scale_norm1000}}.
+**Kết quả: E4 của mình chưa hoàn thành.** Giá trị `norm1000` chính là E3 nên chỉ cần chấm lại dự đoán của E3 (`report/evidence/e4_coord_scale_norm1000.json`). Lượt `pixel` đã bắt đầu (bước 1/300: loss 1,969, VRAM đỉnh 9,66 GB, xem output cuối của cell E4 trong notebook), nhưng phiên Colab bị ngắt trước bước 100 nên không có checkpoint nào. Sau đó mình hết quota GPU Colab miễn phí, không chạy lại được. Vì vậy mình **không có số** để trả lời "pixel tốt hơn hay kém hơn".
 
-[[TODO: kết luận. Nếu CI ghép cặp chứa 0: "với 300 bước, model học được cả thang pixel; hiệu nằm trong CI nên mình không kết luận thang nào tốt hơn, chỉ chắc chắn rằng thang phải nhất quán giữa nhãn–prompt–chấm (câu 3)". Nếu pixel kém rõ: "thang 0–1000 khớp với pretrain của Qwen3-VL nên học nhanh hơn; ở thang pixel model còn phải tự học quy đổi theo 640×360 trong khi lưới nó thấy là 640×352"]]
+Khi xem lại log, mình còn thấy lượt `pixel` đó được khởi động với batch 2 × tích luỹ 4 (đọc từ `configs/e3.yaml`), trong khi E3 thật chạy batch 1 × 8 vì hết VRAM. Nếu chạy xong, E4 sẽ đổi **hai** biến (thang toạ độ + cách chia batch), không còn là ablation sạch, và còn có nguy cơ hết VRAM như E3. Mình đã sửa `e4_run` để lấy cấu hình từ `run.json` của setup gốc (commit "Sửa lỗi khi chạy thật trên Colab T4"), nhưng chưa có GPU để chạy lại bản đã sửa.
 
-Độ tin cậy: đây là **một lần chạy, một seed**, trên 311 ảnh từ 3 phiên. Kết luận chỉ đáng tin nếu CI ghép cặp không chứa 0, và kể cả khi đó cũng chỉ đúng cho 300 bước huấn luyện này. Thang pixel có thể chỉ cần học lâu hơn.
+Điều mình vẫn kết luận được, từ câu 3:
+
+- Thang trong nhãn, prompt và chấm phải khớp nhau. Lệch thang làm F1 về 0,000 cả với đáp án hoàn hảo (oracle) lẫn với output thật của E3 (0,435 → 0,000).
+- Model gốc đã trả đúng thang 0–1000 ngay từ zero-shot (95,7% box có y > 360). Vì vậy mình dự đoán thang pixel sẽ học chậm hơn trong cùng 300 bước: model phải học lại quy ước toạ độ, trong khi lưới ảnh nó thấy là 640×352 chứ không phải 640×360.
+
+Đây chỉ là **dự đoán, không phải kết quả đo**. Kể cả khi chạy xong, một lần chạy một seed trên 311 ảnh từ 3 phiên quay chỉ cho phép kết luận nếu CI ghép cặp của hiệu không chứa 0 (câu 8).
 
 ## Nhìn lại
 
@@ -239,7 +244,7 @@ Các lỗi dữ liệu mình gặp mà công cụ của đề chưa bắt:
 
 Mình **không chạy E5** (tuỳ chọn) vì hết thời gian Colab. Hàm reward và 16 test của nó (`lab/reward.py`, `python -m pytest lab`) đã có và chạy được không cần GPU; code GRPO nằm trong notebook mục 8b (`RUN_E5 = False`).
 
-Điều mình chưa hiểu hết: DeepStack cộng đặc trưng của ViT vào 3 lớp đầu của LLM. Mình chưa đo riêng được việc mở `deepstack_merger_list` (82M) hay `merger` (27M) đóng góp phần lớn vào khác biệt E2 so với E1. Muốn biết thì cần thêm một ablation chỉ mở `merger`.
+Điều mình chưa hiểu hết: DeepStack cộng đặc trưng của ViT vào 3 lớp đầu của LLM. Mình chưa đo riêng được việc mở `deepstack_merger_list` (82M) hay `merger` (27M) đóng góp phần lớn vào khác biệt E2 so với E1. Muốn biết thì cần thêm một ablation chỉ mở `merger`. Mình cũng chưa trả lời được câu 10 bằng số của mình (E4 pixel chưa chạy xong).
 
 Điều mình thấy bất ngờ khi chạy thật:
 
